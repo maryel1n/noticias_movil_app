@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../widgets/drawer_menu.dart';
+import 'sports_page.dart';
+import 'article_detail_page.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
   static const emolBlue = Color(0xFF1E5BB8);
@@ -9,7 +13,23 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6F8),
-      drawer: const _DummyDrawer(),
+      drawer: DrawerMenu(
+        selectedIndex: 0, // 0=Home, 1=Deportes, 2=Tendencias
+        onMenuItemTapped: (index) {
+          Navigator.pop(context);
+          if (index == 1) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const SportsPage()),
+            );
+          } else if (index == 2) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Tendencias: pronto ✨')),
+            );
+          }
+          // index 0 = ya estamos en Home
+        },
+      ),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -147,79 +167,74 @@ class _NewsCard extends StatelessWidget {
       color: const Color(0xFF1E5BB8),
     );
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      clipBehavior: Clip.antiAlias,
-      elevation: featured ? 2 : 1,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Image.network(article.imageUrl, fit: BoxFit.cover),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-            child: Text(article.title, style: titleStyle),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            child: Row(
-              children: [
-                const Icon(Icons.access_time, size: 18, color: Colors.blueGrey),
-                const SizedBox(width: 4),
-                Text(article.time),
-                const SizedBox(width: 12),
-                const Icon(
-                  Icons.chat_bubble_outline,
-                  size: 18,
-                  color: Colors.blueGrey,
-                ),
-                const SizedBox(width: 4),
-                Text('${article.comments}'),
-              ],
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ArticleDetailPage(
+              title: article.title,
+              imageUrl: article.imageUrl,
+              summary: article.summary,
+              time: article.time,
+              comments: article.comments,
             ),
           ),
-          if (featured && article.summary.isNotEmpty)
+        );
+      },
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        clipBehavior: Clip.antiAlias,
+        elevation: featured ? 2 : 1,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Image.network(article.imageUrl, fit: BoxFit.cover),
+            ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              child: Text(article.summary, style: const TextStyle(height: 1.3)),
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+              child: Text(article.title, style: titleStyle),
             ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DummyDrawer extends StatelessWidget {
-  const _DummyDrawer();
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: const [
-          DrawerHeader(
-            decoration: BoxDecoration(color: Colors.red),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Menú',
-                style: TextStyle(color: Colors.white, fontSize: 18),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.access_time,
+                    size: 18,
+                    color: Colors.blueGrey,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(article.time),
+                  const SizedBox(width: 12),
+                  const Icon(
+                    Icons.chat_bubble_outline,
+                    size: 18,
+                    color: Colors.blueGrey,
+                  ),
+                  const SizedBox(width: 4),
+                  Text('${article.comments}'),
+                ],
               ),
             ),
-          ),
-          ListTile(leading: Icon(Icons.article), title: Text('Portada')),
-          ListTile(leading: Icon(Icons.sports_soccer), title: Text('Deportes')),
-          ListTile(leading: Icon(Icons.trending_up), title: Text('Tendencias')),
-        ],
+            if (featured && article.summary.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                child: Text(
+                  article.summary,
+                  style: const TextStyle(height: 1.3),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
 }
 
-// Datos de prueba locales
+// Datos de prueba
 class _Article {
   final String title, summary, imageUrl, time;
   final int comments;
@@ -237,24 +252,24 @@ const _demoArticles = <_Article>[
     title:
         '"Turbazos": Los casos que despertaron la preocupación del Gobierno y el llamado de diputados a tomar medidas',
     summary:
-        'El ministro de Seguridad Pública reconoció la inquietud tras un asalto ocurrido recientemente...',
-    imageUrl: 'https://picsum.photos/seed/emol1/1200/700',
+        'El ministro de Seguridad Pública reconoció inquietud tras un asalto reciente...',
+    imageUrl: 'https://picsum.photos/seed/home1/1200/700',
     time: '21:32',
     comments: 79,
   ),
   _Article(
     title:
-        'Tornado en Linares: Senapred cifra en 83 viviendas con daños y 850 clientes sin suministro eléctrico',
+        'Tornado en Linares: Senapred cifra 83 viviendas con daños y 850 clientes sin luz',
     summary: 'En el Biobío se registró una tromba marina; hubo anegamientos.',
-    imageUrl: 'https://picsum.photos/seed/emol2/1200/700',
+    imageUrl: 'https://picsum.photos/seed/home2/1200/700',
     time: '22:18',
     comments: 1,
   ),
   _Article(
     title:
-        'Qué dijo Alexis Sánchez tras la victoria y la reflexión del técnico sobre su influencia',
+        'Qué dijo Alexis Sánchez tras la victoria y la reflexión del técnico',
     summary: 'El delantero chileno fue figura y dejó declaraciones.',
-    imageUrl: 'https://picsum.photos/seed/emol3/1200/700',
+    imageUrl: 'https://picsum.photos/seed/home3/1200/700',
     time: '20:00',
     comments: 72,
   ),
