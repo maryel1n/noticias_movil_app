@@ -29,6 +29,7 @@ class HomePage extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const TrendsPage()),
             );
           }
+          // index 0 = ya estamos en Home
         },
       ),
       body: SafeArea(
@@ -79,13 +80,23 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          Text(
-            'emol.',
-            style: GoogleFonts.inter(
-              color: emolBlue,
-              fontWeight: FontWeight.w800,
-              fontSize: 24,
-              letterSpacing: -0.5,
+          // ← logo que siempre lleva a Home
+          InkWell(
+            onTap: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const HomePage()),
+                (route) => false,
+              );
+            },
+            child: Text(
+              'emol.',
+              style: GoogleFonts.inter(
+                color: emolBlue,
+                fontWeight: FontWeight.w800,
+                fontSize: 24,
+                letterSpacing: -0.5,
+              ),
             ),
           ),
           const Spacer(),

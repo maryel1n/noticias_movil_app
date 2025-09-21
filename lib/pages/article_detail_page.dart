@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'home_page.dart';
+
 class ArticleDetailPage extends StatefulWidget {
   final String title;
   final String imageUrl;
@@ -48,13 +50,23 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
           onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
-        title: Text(
-          'emol.',
-          style: GoogleFonts.inter(
-            color: emolBlue,
-            fontWeight: FontWeight.w800,
-            fontSize: 22,
-            letterSpacing: -0.5,
+        // ← logo que siempre lleva a Home
+        title: InkWell(
+          onTap: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const HomePage()),
+              (route) => false,
+            );
+          },
+          child: Text(
+            'emol.',
+            style: GoogleFonts.inter(
+              color: emolBlue,
+              fontWeight: FontWeight.w800,
+              fontSize: 22,
+              letterSpacing: -0.5,
+            ),
           ),
         ),
         actions: [
@@ -84,7 +96,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
               ),
               const Divider(height: 1),
 
-              // Título y metadatos
               _titleBlock(widget.title),
               _metaRow(
                 time: widget.time,
@@ -92,7 +103,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                 comments: widget.comments,
               ),
 
-              // Párrafos iniciales (previo a expandir)
               _paragraph(widget.summary),
               _paragraph(
                 'Diversas son las expectativas que tienen parlamentarios respecto del viaje que realizará el presidente Gabriel Boric a la ONU, en Nueva York, Estados Unidos.',
@@ -101,7 +111,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                 'El Mandatario participará en distintas actividades, siendo parte de la apertura y debate de la 80ª Asamblea General de Naciones Unidas.',
               ),
 
-              // Botón para desplegar contenido completo
               if (!_expanded)
                 _primaryButton(
                   label: 'Leer artículo completo',
@@ -120,7 +129,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                   },
                 ),
 
-              // Sección expandida (anclada)
               if (_expanded) ...[
                 Container(key: _expandedAnchor),
                 _subTitle('Contexto y reacciones'),
@@ -141,7 +149,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                 ]),
                 const SizedBox(height: 12),
 
-                // Noticias relacionadas
                 _relatedTitle(),
                 _relatedGrid(),
 
@@ -156,7 +163,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
     );
   }
 
-  // ─────────── Widgets reutilizables ───────────
+  // Widgets auxiliares
 
   Widget _headline() => Container(
     color: Colors.white,
@@ -432,8 +439,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
   );
 }
 
-// ─────────── Datos mock de “relacionadas” ───────────
-
+// Datos mock de relacionadas
 class _Related {
   final String title;
   final String imageUrl;

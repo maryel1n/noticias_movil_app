@@ -10,7 +10,7 @@ class TrendsPage extends StatelessWidget {
   const TrendsPage({super.key});
 
   static const emolBlue = Color(0xFF1E5BB8);
-  static const trendsPurple = Color(0xFF8E44AD); // subrayado morado
+  static const trendsPurple = Color(0xFF8E44AD);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,6 @@ class TrendsPage extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const SportsPage()),
             );
           }
-          // index == 2 -> ya estamos aquí
         },
       ),
       body: SafeArea(
@@ -68,13 +67,23 @@ class _TopBar extends StatelessWidget {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
           const Spacer(),
-          Text(
-            'emol.',
-            style: GoogleFonts.inter(
-              color: emolBlue,
-              fontWeight: FontWeight.w800,
-              fontSize: 24,
-              letterSpacing: -0.5,
+          // ← logo que siempre lleva a Home
+          InkWell(
+            onTap: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const HomePage()),
+                (route) => false,
+              );
+            },
+            child: Text(
+              'emol.',
+              style: GoogleFonts.inter(
+                color: emolBlue,
+                fontWeight: FontWeight.w800,
+                fontSize: 24,
+                letterSpacing: -0.5,
+              ),
             ),
           ),
           const Spacer(),

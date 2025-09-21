@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Navegación / Drawer
 import '../widgets/drawer_menu.dart';
 import 'home_page.dart';
-import 'article_detail_page.dart';
 import 'trends_page.dart';
+import 'article_detail_page.dart';
 
 class SportsPage extends StatelessWidget {
   const SportsPage({super.key});
@@ -18,7 +17,7 @@ class SportsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6F8),
       drawer: DrawerMenu(
-        selectedIndex: 1,
+        selectedIndex: 1, // 0=Home, 1=Deportes, 2=Tendencias
         onMenuItemTapped: (index) {
           Navigator.pop(context);
           if (index == 0) {
@@ -32,7 +31,6 @@ class SportsPage extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const TrendsPage()),
             );
           }
-          // index == 1: ya estamos en Deportes
         },
       ),
       body: SafeArea(
@@ -43,14 +41,11 @@ class SportsPage extends StatelessWidget {
             const _SectionHeader(),
             const _ScoreBox(),
             const SizedBox(height: 8),
-
-            // noticias (NO usar const porque usan datos dinámicos)
             _NewsCard(article: _sArticles[0], featured: true),
             _NewsCard(article: _sArticles[1]),
             const _PromoRow(),
             _NewsCard(article: _sArticles[2]),
             const _PromoRow2(),
-
             const SizedBox(height: 24),
           ],
         ),
@@ -59,7 +54,6 @@ class SportsPage extends StatelessWidget {
   }
 }
 
-/// ───────────────── UI: Barra superior ─────────────────
 class _TopBar extends StatelessWidget {
   const _TopBar();
 
@@ -78,13 +72,23 @@ class _TopBar extends StatelessWidget {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
           const Spacer(),
-          Text(
-            'emol.',
-            style: GoogleFonts.inter(
-              color: emolBlue,
-              fontWeight: FontWeight.w800,
-              fontSize: 24,
-              letterSpacing: -0.5,
+          // ← logo que siempre lleva a Home
+          InkWell(
+            onTap: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const HomePage()),
+                (route) => false,
+              );
+            },
+            child: Text(
+              'emol.',
+              style: GoogleFonts.inter(
+                color: emolBlue,
+                fontWeight: FontWeight.w800,
+                fontSize: 24,
+                letterSpacing: -0.5,
+              ),
             ),
           ),
           const Spacer(),
@@ -95,7 +99,6 @@ class _TopBar extends StatelessWidget {
   }
 }
 
-/// Título "Deportes" + subrayado verde
 class _SectionHeader extends StatelessWidget {
   const _SectionHeader();
 
@@ -119,7 +122,6 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-/// Caja “PROGRAMACIÓN Y RESULTADOS” (simplificada)
 class _ScoreBox extends StatelessWidget {
   const _ScoreBox();
 
@@ -252,7 +254,6 @@ class _MatchRow extends StatelessWidget {
   }
 }
 
-/// Tarjeta de noticia (tap → detalle)
 class _NewsCard extends StatelessWidget {
   final _SArticle article;
   final bool featured;
@@ -334,7 +335,6 @@ class _NewsCard extends StatelessWidget {
   }
 }
 
-/// Fila promocional 1
 class _PromoRow extends StatelessWidget {
   const _PromoRow();
 
@@ -379,7 +379,6 @@ class _PromoRow extends StatelessWidget {
   }
 }
 
-/// Fila promocional 2
 class _PromoRow2 extends StatelessWidget {
   const _PromoRow2();
 
@@ -445,7 +444,6 @@ class _MetaRow extends StatelessWidget {
   }
 }
 
-/// Datos de ejemplo (ejecución estable)
 class _SArticle {
   final String title, summary, imageUrl, time;
   final int comments;
