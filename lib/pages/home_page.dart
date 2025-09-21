@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets/drawer_menu.dart';
 import 'sports_page.dart';
+import 'trends_page.dart';
 import 'article_detail_page.dart';
 
 class HomePage extends StatelessWidget {
@@ -23,11 +24,11 @@ class HomePage extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const SportsPage()),
             );
           } else if (index == 2) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Tendencias: pronto ✨')),
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const TrendsPage()),
             );
           }
-          // index 0 = ya estamos en Home
         },
       ),
       body: SafeArea(
@@ -234,7 +235,7 @@ class _NewsCard extends StatelessWidget {
   }
 }
 
-// Datos de prueba
+// Datos mock
 class _Article {
   final String title, summary, imageUrl, time;
   final int comments;

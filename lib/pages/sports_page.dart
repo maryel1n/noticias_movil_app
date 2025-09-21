@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../widgets/drawer_menu.dart';
 import 'home_page.dart';
 import 'article_detail_page.dart';
+import 'trends_page.dart';
 
 class SportsPage extends StatelessWidget {
   const SportsPage({super.key});
@@ -17,17 +18,21 @@ class SportsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6F8),
       drawer: DrawerMenu(
-        selectedIndex: 1, // 0=Home, 1=Deportes, 2=Tendencias
+        selectedIndex: 1,
         onMenuItemTapped: (index) {
-          Navigator.pop(context); // cierra el drawer
+          Navigator.pop(context);
           if (index == 0) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => const HomePage()),
             );
+          } else if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const TrendsPage()),
+            );
           }
-          // index == 1 -> ya estamos aquí
-          // index == 2 -> lo conectaremos cuando exista TrendsPage
+          // index == 1: ya estamos en Deportes
         },
       ),
       body: SafeArea(
