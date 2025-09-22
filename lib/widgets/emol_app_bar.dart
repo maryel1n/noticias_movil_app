@@ -1,3 +1,6 @@
+// Funcionalidad adicional #4:
+// Acceso rápido al Home al tocar el logo, replicando el comportamiento del sitio.
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -36,14 +39,14 @@ class EmolAppBar extends StatelessWidget implements PreferredSizeWidget {
               TextSpan(
                 text: 'emol',
                 style: GoogleFonts.inter(
-                  color: const Color(0xFF1565C0), // azul emol aprox
+                  color: const Color(0xFF1565C0),
                   fontWeight: FontWeight.w800,
                 ),
               ),
               TextSpan(
                 text: '.',
                 style: GoogleFonts.inter(
-                  color: const Color(0xFFE53935), // puntito rojo
+                  color: const Color(0xFFE53935),
                   fontWeight: FontWeight.w800,
                 ),
               ),

@@ -1,3 +1,7 @@
+// Funcionalidad adicional #5:
+// Botón para expandir el cuerpo de la noticia y bloque de "noticias relacionadas".
+// Mejora la experiencia y la fidelidad con el sitio original.
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -15,25 +19,12 @@ class ArticleDetailPage extends StatefulWidget {
     this.related,
   });
 
-  /// Título principal
   final String title;
-
-  /// Imagen a mostrar arriba (puede ser asset: 'assets/...jpg' o URL)
   final String imageUrl;
-
-  /// Bajada / subtítulo opcional
   final String? subtitle;
-
-  /// Autor opcional
   final String? author;
-
-  /// Fecha opcional (ej. '21 SEP 2025 - 12:34')
   final String? dateString;
-
-  /// Párrafos del artículo (si no viene, se cargan por defecto)
   final List<String>? body;
-
-  /// Noticias relacionadas (si no vienen, se crean por defecto)
   final List<RelatedItem>? related;
 
   @override
@@ -46,7 +37,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
   bool _expanded = false;
 
   void _goHome(BuildContext context) {
-    // vuelve a la primera pantalla (Home)
     Navigator.of(context).popUntil((r) => r.isFirst);
   }
 
@@ -57,7 +47,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
     _paragraphs =
         widget.body ??
         [
-          // 👇 Texto de ejemplo (puedes reemplazar con el real cuando tengas API)
           'Esta es una versión resumida del contenido. Estamos replicando el estilo de EMOL para tu app con Flutter.',
           'La nota incluye antecedentes, contexto y declaraciones clave. Al pulsar "Leer artículo completo" verás el texto extendido.',
           'También añadimos un bloque de "Noticias relacionadas" para fomentar la navegación dentro de tu app.',
@@ -146,22 +135,15 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         children: [
-          // Imagen principal
           ArticleImage(imageUrl: widget.imageUrl, height: 240),
           const SizedBox(height: 12),
-
-          // Título
           Text(widget.title, style: titleStyle),
           const SizedBox(height: 6),
-
-          // Subtítulo (opcional)
           if (widget.subtitle != null &&
               widget.subtitle!.trim().isNotEmpty) ...[
             Text(widget.subtitle!, style: subtitleStyle),
             const SizedBox(height: 6),
           ],
-
-          // Metadatos (fecha / autor) si existen
           if ((widget.dateString?.isNotEmpty ?? false) ||
               (widget.author?.isNotEmpty ?? false)) ...[
             Row(
@@ -193,8 +175,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
             ),
             const SizedBox(height: 12),
           ],
-
-          // Párrafos (resumen o completo)
           ...visibleParagraphs
               .map(
                 (p) => Padding(
@@ -206,8 +186,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                 ),
               )
               .toList(),
-
-          // Botón "Leer artículo completo" (expande el resto)
           if (!_expanded && _paragraphs.length > 2)
             Align(
               alignment: Alignment.centerLeft,
@@ -228,15 +206,11 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
           const SizedBox(height: 16),
           const Divider(),
           const SizedBox(height: 8),
-
-          // Noticias relacionadas
           Text(
             'Noticias relacionadas',
             style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 8),
-
-          // Lista vertical de relacionadas
           ..._related.map(
             (r) => Card(
               elevation: 0,
@@ -253,7 +227,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                       builder: (_) => ArticleDetailPage(
                         title: r.title,
                         imageUrl: r.imageUrl,
-                        // Puedes pasar aquí subtitle/author/fecha si los tienes
                       ),
                     ),
                   );
@@ -263,7 +236,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Miniatura
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: SizedBox(
@@ -278,7 +250,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      // Título
                       Expanded(
                         child: Text(
                           r.title,
@@ -299,7 +270,6 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
   }
 }
 
-/// Modelo simple para noticias relacionadas
 class RelatedItem {
   final String title;
   final String imageUrl;

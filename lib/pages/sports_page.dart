@@ -21,7 +21,7 @@ class SportsPage extends StatelessWidget {
     if (i == 0) {
       _goHome(context);
     } else if (i == 1) {
-      Navigator.pop(context); // ya estás en Deportes
+      Navigator.pop(context);
     } else if (i == 2) {
       Navigator.pushReplacement(
         context,

@@ -1,10 +1,11 @@
+// Funcionalidad adicional #2:
+// Estrategia de imágenes: intenta asignar imágenes coherentes por título/sección
+// y provee un fallback estable. Mejora fidelidad visual sin depender de backend.
+
 import 'package:flutter/material.dart';
 import '../data/manual_images.dart';
 
-/// Busca primero una imagen local por título; si no encuentra,
-/// usa una imagen estable de internet (Picsum) forzando .jpg.
 class ImageHelper {
-  // --- normalización sencilla (quita tildes) ---
   static String _norm(String s) {
     final lower = s.toLowerCase();
     const repl = {
@@ -24,7 +25,6 @@ class ImageHelper {
     return b.toString();
   }
 
-  // --- lookup en mapa manual ---
   static String? assetForTitle(String title) {
     final t = _norm(title);
     for (final e in manualImages.entries) {
@@ -33,7 +33,6 @@ class ImageHelper {
     return null;
   }
 
-  // --- fallback: picsum estable ---
   static String _seedFrom(String title, {String? section}) {
     final base = ('${section ?? ''} $title').toLowerCase();
     final clean = base.replaceAll(RegExp(r'[^a-z0-9]+'), '-');
@@ -52,7 +51,7 @@ class ImageHelper {
     return 'https://picsum.photos/seed/$seed/$w/$h.jpg';
   }
 
-  /// Compatibilidad si alguna parte de tu código aún espera una URL.
+  /// Compatibilidad si alguna parte del código aún espera una URL.
   static String unsplashFromTitle(
     String title, {
     String? section,
@@ -60,7 +59,6 @@ class ImageHelper {
     int h = 700,
   }) => imageFromTitle(title, section: section, w: w, h: h);
 
-  // --- widget listo para pegar ---
   static Widget widgetFromTitle(
     String title, {
     String? section,

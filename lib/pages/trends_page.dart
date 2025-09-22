@@ -26,7 +26,7 @@ class TrendsPage extends StatelessWidget {
         MaterialPageRoute(builder: (_) => const SportsPage()),
       );
     } else if (i == 2) {
-      Navigator.pop(context); // ya estás en Tendencias
+      Navigator.pop(context);
     }
   }
 

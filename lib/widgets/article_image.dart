@@ -1,3 +1,7 @@
+// Funcionalidad adicional #1:
+// Widget reutilizable y encapsulado para mostrar imágenes de artículos con
+// placeholder y manejo de error. Permite centralizar estilos y lógica.
+
 import 'package:flutter/material.dart';
 
 class ArticleImage extends StatelessWidget {

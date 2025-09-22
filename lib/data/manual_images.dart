@@ -1,5 +1,6 @@
-// lib/data/manual_images.dart
-// Claves a detectar en el título (minúsculas, con y sin tildes) -> asset en assets/images/
+// Funcionalidad adicional #3:
+// Mapeo manual título→asset para asegurar imágenes pertinentes por noticia.
+// Se prioriza este mapeo y luego se cae al helper si no hay coincidencia.
 
 const Map<String, String> manualImages = {
   // ===== Portada / generales =====

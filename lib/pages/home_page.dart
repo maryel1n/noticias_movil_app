@@ -159,10 +159,7 @@ class _CardNoticia extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => ArticleDetailPage(
-                title: title,
-                imageUrl: image, // 👈 ahora pasa imageUrl
-              ),
+              builder: (_) => ArticleDetailPage(title: title, imageUrl: image),
             ),
           );
         },
