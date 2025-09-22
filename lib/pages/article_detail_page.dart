@@ -1,458 +1,308 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'home_page.dart';
+import '../widgets/article_image.dart';
 
 class ArticleDetailPage extends StatefulWidget {
-  final String title;
-  final String imageUrl;
-  final String summary;
-  final String time;
-  final int comments;
-  final String author;
-
   const ArticleDetailPage({
     super.key,
     required this.title,
     required this.imageUrl,
-    required this.summary,
-    required this.time,
-    required this.comments,
-    this.author = 'Redacción Emol',
+    this.subtitle,
+    this.author,
+    this.dateString,
+    this.body,
+    this.related,
   });
+
+  /// Título principal
+  final String title;
+
+  /// Imagen a mostrar arriba (puede ser asset: 'assets/...jpg' o URL)
+  final String imageUrl;
+
+  /// Bajada / subtítulo opcional
+  final String? subtitle;
+
+  /// Autor opcional
+  final String? author;
+
+  /// Fecha opcional (ej. '21 SEP 2025 - 12:34')
+  final String? dateString;
+
+  /// Párrafos del artículo (si no viene, se cargan por defecto)
+  final List<String>? body;
+
+  /// Noticias relacionadas (si no vienen, se crean por defecto)
+  final List<RelatedItem>? related;
 
   @override
   State<ArticleDetailPage> createState() => _ArticleDetailPageState();
 }
 
 class _ArticleDetailPageState extends State<ArticleDetailPage> {
-  static const emolBlue = Color(0xFF1E5BB8);
-
-  final _scrollCtrl = ScrollController();
-  final _expandedAnchor = GlobalKey();
+  late List<String> _paragraphs;
+  late List<RelatedItem> _related;
   bool _expanded = false;
 
+  void _goHome(BuildContext context) {
+    // vuelve a la primera pantalla (Home)
+    Navigator.of(context).popUntil((r) => r.isFirst);
+  }
+
   @override
-  void dispose() {
-    _scrollCtrl.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+
+    _paragraphs =
+        widget.body ??
+        [
+          // 👇 Texto de ejemplo (puedes reemplazar con el real cuando tengas API)
+          'Esta es una versión resumida del contenido. Estamos replicando el estilo de EMOL para tu app con Flutter.',
+          'La nota incluye antecedentes, contexto y declaraciones clave. Al pulsar "Leer artículo completo" verás el texto extendido.',
+          'También añadimos un bloque de "Noticias relacionadas" para fomentar la navegación dentro de tu app.',
+          'Esta es la sección expandida del artículo, visible solo cuando pulsas el botón.',
+        ];
+
+    _related =
+        widget.related ??
+        [
+          RelatedItem(
+            title:
+                'Tornado en Linares: Senapred cifra 83 viviendas con daños y 850 clientes sin luz',
+            imageUrl: 'assets/images/tornado-linares.jpg',
+          ),
+          RelatedItem(
+            title:
+                'Qué dijo Alexis Sánchez tras la victoria y la reflexión del técnico',
+            imageUrl: 'assets/images/alexis.jpg',
+          ),
+          RelatedItem(
+            title: 'Ideas de clósets modulares que están en tendencia',
+            imageUrl: 'assets/images/closets.jpg',
+          ),
+        ];
   }
 
   @override
   Widget build(BuildContext context) {
+    final titleStyle = GoogleFonts.inter(
+      color: const Color(0xFF1565C0),
+      fontSize: 26,
+      fontWeight: FontWeight.w800,
+      height: 1.15,
+    );
+    final subtitleStyle = GoogleFonts.inter(
+      fontSize: 16,
+      color: Colors.black87,
+      height: 1.35,
+    );
+    final metaStyle = GoogleFonts.inter(fontSize: 12, color: Colors.black54);
+    final relatedTitleStyle = GoogleFonts.inter(
+      color: const Color(0xFF1565C0),
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+      height: 1.2,
+    );
+
+    final visibleParagraphs = _expanded ? _paragraphs : _paragraphs.take(2);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6F8),
+      // AppBar con logo “emol.” que vuelve al Home al tocarlo
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
+        leading: const BackButton(color: Colors.black87),
+        title: GestureDetector(
+          onTap: () => _goHome(context),
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: 'emol',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF1565C0),
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                TextSpan(
+                  text: '.',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFFE53935),
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
         centerTitle: true,
-        // ← logo que siempre lleva a Home
-        title: InkWell(
-          onTap: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const HomePage()),
-              (route) => false,
-            );
-          },
-          child: Text(
-            'emol.',
-            style: GoogleFonts.inter(
-              color: emolBlue,
-              fontWeight: FontWeight.w800,
-              fontSize: 22,
-              letterSpacing: -0.5,
-            ),
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.black87),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFE74C3C),
-        onPressed: () => ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Compartir (demo)'))),
-        child: const Icon(Icons.share, color: Colors.white, size: 26),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          controller: _scrollCtrl,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _headline(),
-              _heroImage(widget.imageUrl),
-              _caption(
-                'El presidente Gabriel Boric viajará este lunes 22 de septiembre a Nueva York, Estados Unidos.',
-              ),
-              const Divider(height: 1),
-
-              _titleBlock(widget.title),
-              _metaRow(
-                time: widget.time,
-                author: widget.author,
-                comments: widget.comments,
-              ),
-
-              _paragraph(widget.summary),
-              _paragraph(
-                'Diversas son las expectativas que tienen parlamentarios respecto del viaje que realizará el presidente Gabriel Boric a la ONU, en Nueva York, Estados Unidos.',
-              ),
-              _paragraph(
-                'El Mandatario participará en distintas actividades, siendo parte de la apertura y debate de la 80ª Asamblea General de Naciones Unidas.',
-              ),
-
-              if (!_expanded)
-                _primaryButton(
-                  label: 'Leer artículo completo',
-                  onTap: () async {
-                    setState(() => _expanded = true);
-                    await Future.delayed(const Duration(milliseconds: 100));
-                    final ctx = _expandedAnchor.currentContext;
-                    if (ctx != null) {
-                      Scrollable.ensureVisible(
-                        ctx,
-                        duration: const Duration(milliseconds: 350),
-                        alignment: 0.05,
-                        curve: Curves.easeOut,
-                      );
-                    }
-                  },
-                ),
-
-              if (_expanded) ...[
-                Container(key: _expandedAnchor),
-                _subTitle('Contexto y reacciones'),
-                _paragraph(
-                  'Desde la Comisión de Relaciones Exteriores se valoró la oportunidad para reafirmar principios como el multilateralismo, el respeto a los DD.HH. y la resolución pacífica de controversias.',
-                ),
-                _quote(
-                  '“Será una instancia clave para posicionar los intereses del país y fortalecer alianzas estratégicas”.',
-                ),
-                _paragraph(
-                  'En el itinerario se contemplan reuniones bilaterales, encuentros con la comunidad chilena y actividades de promoción económica.',
-                ),
-                _bulletPoints(const [
-                  'Apertura de la Asamblea General',
-                  'Reuniones bilaterales con jefes de Estado',
-                  'Encuentro con la comunidad chilena en Nueva York',
-                  'Agenda económica y de inversiones',
-                ]),
-                const SizedBox(height: 12),
-
-                _relatedTitle(),
-                _relatedGrid(),
-
-                const SizedBox(height: 12),
-                _commentsPlaceholder(),
-                const SizedBox(height: 24),
-              ],
-            ],
-          ),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(height: 1, thickness: .7, color: Color(0x11000000)),
         ),
       ),
-    );
-  }
 
-  // Widgets auxiliares
-
-  Widget _headline() => Container(
-    color: Colors.white,
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-    child: Row(
-      children: [
-        Container(
-          width: 8,
-          height: 8,
-          margin: const EdgeInsets.only(right: 8),
-          decoration: const BoxDecoration(
-            color: Colors.red,
-            shape: BoxShape.circle,
-          ),
-        ),
-        Expanded(
-          child: Text(
-            'EMOLTV  Streaming y entrevistas: La programación para este fin de semana',
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: const Color(0xFF20262E),
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        const Icon(Icons.close, size: 18, color: Colors.grey),
-      ],
-    ),
-  );
-
-  Widget _heroImage(String url) => AspectRatio(
-    aspectRatio: 16 / 9,
-    child: Image.network(url, fit: BoxFit.cover),
-  );
-
-  Widget _caption(String text) => Container(
-    color: Colors.white,
-    padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-    child: Text(text, style: GoogleFonts.inter(fontSize: 14, height: 1.25)),
-  );
-
-  Widget _titleBlock(String t) => Container(
-    color: Colors.white,
-    padding: const EdgeInsets.fromLTRB(12, 16, 12, 10),
-    child: Text(
-      t,
-      style: GoogleFonts.inter(
-        color: emolBlue,
-        fontWeight: FontWeight.w800,
-        height: 1.15,
-        fontSize: 26,
-      ),
-    ),
-  );
-
-  Widget _metaRow({
-    required String time,
-    required String author,
-    required int comments,
-  }) {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 14),
-      child: Row(
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         children: [
-          Text(
-            '21 de Septiembre de 2025 | $time | Por ',
-            style: GoogleFonts.inter(),
-          ),
-          Text(
-            author,
-            style: GoogleFonts.inter(
-              color: emolBlue,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const Spacer(),
-          const Icon(
-            Icons.chat_bubble_outline,
-            size: 18,
-            color: Colors.blueGrey,
-          ),
-          const SizedBox(width: 4),
-          Text('$comments'),
-        ],
-      ),
-    );
-  }
+          // Imagen principal
+          ArticleImage(imageUrl: widget.imageUrl, height: 240),
+          const SizedBox(height: 12),
 
-  Widget _paragraph(String text) => Container(
-    color: Colors.white,
-    padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-    child: Text(
-      text,
-      style: GoogleFonts.inter(
-        fontSize: 16,
-        height: 1.5,
-        color: const Color(0xFF20262E),
-      ),
-    ),
-  );
+          // Título
+          Text(widget.title, style: titleStyle),
+          const SizedBox(height: 6),
 
-  Widget _subTitle(String text) => Container(
-    color: Colors.white,
-    padding: const EdgeInsets.fromLTRB(12, 16, 12, 6),
-    child: Text(
-      text,
-      style: GoogleFonts.inter(
-        fontSize: 18,
-        fontWeight: FontWeight.w800,
-        color: emolBlue,
-      ),
-    ),
-  );
+          // Subtítulo (opcional)
+          if (widget.subtitle != null &&
+              widget.subtitle!.trim().isNotEmpty) ...[
+            Text(widget.subtitle!, style: subtitleStyle),
+            const SizedBox(height: 6),
+          ],
 
-  Widget _quote(String text) => Container(
-    color: Colors.white,
-    padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-    child: Row(
-      children: [
-        Container(width: 4, height: 60, color: const Color(0xFFB3C7E6)),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            text,
-            style: GoogleFonts.inter(
-              fontStyle: FontStyle.italic,
-              color: Colors.black87,
-              height: 1.4,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _bulletPoints(List<String> items) => Container(
-    color: Colors.white,
-    padding: const EdgeInsets.fromLTRB(12, 6, 12, 12),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: items
-          .map(
-            (e) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('•  ', style: TextStyle(fontSize: 18)),
-                  Expanded(
-                    child: Text(e, style: GoogleFonts.inter(height: 1.4)),
+          // Metadatos (fecha / autor) si existen
+          if ((widget.dateString?.isNotEmpty ?? false) ||
+              (widget.author?.isNotEmpty ?? false)) ...[
+            Row(
+              children: [
+                if (widget.dateString != null && widget.dateString!.isNotEmpty)
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.schedule,
+                        size: 14,
+                        color: Colors.black45,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(widget.dateString!, style: metaStyle),
+                    ],
                   ),
-                ],
+                if ((widget.dateString?.isNotEmpty ?? false) &&
+                    (widget.author?.isNotEmpty ?? false))
+                  const SizedBox(width: 12),
+                if (widget.author != null && widget.author!.isNotEmpty)
+                  Row(
+                    children: [
+                      const Icon(Icons.person, size: 14, color: Colors.black45),
+                      const SizedBox(width: 4),
+                      Text(widget.author!, style: metaStyle),
+                    ],
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
+
+          // Párrafos (resumen o completo)
+          ...visibleParagraphs
+              .map(
+                (p) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    p,
+                    style: GoogleFonts.inter(fontSize: 16, height: 1.45),
+                  ),
+                ),
+              )
+              .toList(),
+
+          // Botón "Leer artículo completo" (expande el resto)
+          if (!_expanded && _paragraphs.length > 2)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ElevatedButton.icon(
+                onPressed: () => setState(() => _expanded = true),
+                icon: const Icon(Icons.article),
+                label: const Text('Leer artículo completo'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1565C0),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
             ),
-          )
-          .toList(),
-    ),
-  );
 
-  Widget _primaryButton({
-    required String label,
-    required VoidCallback onTap,
-  }) => Container(
-    color: Colors.white,
-    padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
-    child: SizedBox(
-      height: 44,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: emolBlue,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        ),
-        onPressed: onTap,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
-            const SizedBox(width: 8),
-            const Icon(Icons.keyboard_arrow_down_rounded),
-          ],
-        ),
-      ),
-    ),
-  );
+          const SizedBox(height: 16),
+          const Divider(),
+          const SizedBox(height: 8),
 
-  Widget _relatedTitle() => Container(
-    color: Colors.white,
-    padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
-    child: RichText(
-      text: TextSpan(
-        style: GoogleFonts.inter(
-          color: const Color(0xFF2B2F36),
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-        ),
-        children: const [
-          TextSpan(
-            text: 'NOTICIAS ',
-            style: TextStyle(color: emolBlue),
+          // Noticias relacionadas
+          Text(
+            'Noticias relacionadas',
+            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800),
           ),
-          TextSpan(text: 'RELACIONADAS'),
-        ],
-      ),
-    ),
-  );
+          const SizedBox(height: 8),
 
-  Widget _relatedGrid() {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(12, 6, 12, 16),
-      child: Row(
-        children: [
-          Expanded(child: _relatedCard(_related[0])),
-          const SizedBox(width: 12),
-          Expanded(child: _relatedCard(_related[1])),
+          // Lista vertical de relacionadas
+          ..._related.map(
+            (r) => Card(
+              elevation: 0,
+              margin: const EdgeInsets.only(bottom: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ArticleDetailPage(
+                        title: r.title,
+                        imageUrl: r.imageUrl,
+                        // Puedes pasar aquí subtitle/author/fecha si los tienes
+                      ),
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Miniatura
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: SizedBox(
+                          width: 110,
+                          height: 72,
+                          child: ArticleImage(
+                            imageUrl: r.imageUrl,
+                            height: 72,
+                            radius: 12,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Título
+                      Expanded(
+                        child: Text(
+                          r.title,
+                          style: relatedTitleStyle,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
-
-  Widget _relatedCard(_Related a) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      AspectRatio(
-        aspectRatio: 16 / 9,
-        child: Image.network(a.imageUrl, fit: BoxFit.cover),
-      ),
-      const SizedBox(height: 6),
-      Text(
-        a.title,
-        maxLines: 3,
-        overflow: TextOverflow.ellipsis,
-        style: GoogleFonts.inter(color: emolBlue, fontWeight: FontWeight.w700),
-      ),
-      const SizedBox(height: 6),
-      Row(
-        children: const [
-          Icon(Icons.chat_bubble_outline, size: 18, color: Colors.blueGrey),
-          SizedBox(width: 4),
-          Text(''),
-        ],
-      ),
-    ],
-  );
-
-  Widget _commentsPlaceholder() => Container(
-    color: Colors.white,
-    padding: const EdgeInsets.fromLTRB(12, 16, 12, 16),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Comenta esta noticia:',
-          style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          'Inicia sesión para interactuar y debatir sobre los temas noticiosos.',
-          style: GoogleFonts.inter(),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            OutlinedButton(onPressed: () {}, child: const Text('Ingresar')),
-            const SizedBox(width: 8),
-            OutlinedButton(onPressed: () {}, child: const Text('Registrarse')),
-          ],
-        ),
-      ],
-    ),
-  );
 }
 
-// Datos mock de relacionadas
-class _Related {
+/// Modelo simple para noticias relacionadas
+class RelatedItem {
   final String title;
   final String imageUrl;
-  const _Related(this.title, this.imageUrl);
-}
 
-const _related = <_Related>[
-  _Related(
-    'Del discurso en la Asamblea General a reuniones bilaterales: las actividades de Boric en su viaje a la ONU',
-    'https://picsum.photos/seed/rel1/800/450',
-  ),
-  _Related(
-    'Carrera a la ONU: cartas para levantar una candidatura a la secretaría general',
-    'https://picsum.photos/seed/rel2/800/450',
-  ),
-];
+  const RelatedItem({required this.title, required this.imageUrl});
+}
