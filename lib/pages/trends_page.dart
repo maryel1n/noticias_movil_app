@@ -97,23 +97,27 @@ class TrendsPage extends StatelessWidget {
 
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-        children: const [
-          _TrendsCard(
+        children: [
+          const _SectionHeader(text: 'TENDENCIAS'),
+          const SizedBox(height: 8),
+
+          // Cards
+          const _TrendsCard(
             image: 'assets/images/carlos.jpg',
             title: 'Video | Carlos III visita a la mujer más longeva del mundo',
             subtitle: 'La británica cumplió 116 años en agosto…',
           ),
-          _TrendsCard(
+          const _TrendsCard(
             image: 'assets/images/closets.jpg',
             title: 'Ideas de clósets modulares que están en tendencia',
             subtitle: 'Almacenamiento inteligente y estiloso.',
           ),
-          _TrendsCard(
+          const _TrendsCard(
             image: 'assets/images/chileno.jpg',
             title: 'Chileno crea app que revoluciona la organización del hogar',
             subtitle: 'Tecnología y vida diaria.',
           ),
-          _TrendsCard(
+          const _TrendsCard(
             image: 'assets/images/india.jpg',
             title: 'India: nuevo récord en energías renovables',
             subtitle: 'Crecimiento sostenido del sector.',
@@ -158,10 +162,7 @@ class _TrendsCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => ArticleDetailPage(
-                title: title,
-                imageUrl: image, // 👈 usar imageUrl
-              ),
+              builder: (_) => ArticleDetailPage(title: title, imageUrl: image),
             ),
           );
         },
@@ -170,7 +171,7 @@ class _TrendsCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ArticleImage(imageUrl: image), // 👈 usar imageUrl
+              ArticleImage(imageUrl: image),
               const SizedBox(height: 12),
               Text(title, style: titleStyle),
               const SizedBox(height: 8),
@@ -178,6 +179,33 @@ class _TrendsCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final labelStyle = GoogleFonts.inter(
+      color: const Color(0xFFE53935),
+      fontSize: 16,
+      fontWeight: FontWeight.w800,
+      letterSpacing: .6,
+    );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 0, 4, 6),
+      child: Row(
+        children: [
+          Text(text, style: labelStyle),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Divider(thickness: 2, color: Color(0xFFE53935)),
+          ),
+        ],
       ),
     );
   }

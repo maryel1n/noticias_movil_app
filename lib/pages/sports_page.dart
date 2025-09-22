@@ -97,24 +97,28 @@ class SportsPage extends StatelessWidget {
 
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-        children: const [
-          _SportsCard(
+        children: [
+          const _SectionHeader(text: 'DEPORTES'),
+          const SizedBox(height: 8),
+
+          // Cards
+          const _SportsCard(
             image: 'assets/images/alexis.jpg',
             title:
                 'Qué dijo Alexis Sánchez tras la victoria y la reflexión del técnico',
             subtitle: 'El delantero chileno analizó el partido…',
           ),
-          _SportsCard(
+          const _SportsCard(
             image: 'assets/images/tabilo.jpg',
             title: 'Tabilo avanza con sólida presentación en el torneo ATP',
             subtitle: 'El chileno se mete en la siguiente ronda.',
           ),
-          _SportsCard(
+          const _SportsCard(
             image: 'assets/images/copa-libertadores.jpg',
             title: 'Copa Libertadores: así quedaron las llaves de semifinales',
             subtitle: 'Cruces de alto voltaje en Sudamérica.',
           ),
-          _SportsCard(
+          const _SportsCard(
             image: 'assets/images/champions.jpg',
             title: 'Champions League: resultados de la jornada',
             subtitle: 'Goles, sorpresas y tabla de posiciones.',
@@ -159,11 +163,7 @@ class _SportsCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => ArticleDetailPage(
-                title: title,
-                imageUrl:
-                    image, // 👈 usar imageUrl (coincide con ArticleDetailPage)
-              ),
+              builder: (_) => ArticleDetailPage(title: title, imageUrl: image),
             ),
           );
         },
@@ -172,9 +172,7 @@ class _SportsCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ArticleImage(
-                imageUrl: image,
-              ), // 👈 usar imageUrl (coincide con ArticleImage)
+              ArticleImage(imageUrl: image),
               const SizedBox(height: 12),
               Text(title, style: titleStyle),
               const SizedBox(height: 8),
@@ -182,6 +180,33 @@ class _SportsCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final labelStyle = GoogleFonts.inter(
+      color: const Color(0xFFE53935),
+      fontSize: 16,
+      fontWeight: FontWeight.w800,
+      letterSpacing: .6,
+    );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 0, 4, 6),
+      child: Row(
+        children: [
+          Text(text, style: labelStyle),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Divider(thickness: 2, color: Color(0xFFE53935)),
+          ),
+        ],
       ),
     );
   }
